@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>HENRIQXIT</title>
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --bg-soft:#141414;
+    --card:#161616;
+    --red:#c3161c;
+    --red-bright:#e31b22;
+    --gold:#ffd558;
+    --gold-bright:#ffe27a;
+    --text:#f2f2f2;
+    --text-dim:#a8a8a8;
+    --border:#2a2a2a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    min-height:100%;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+
+  /* HEADER */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(180deg,#0d0d0d,#0a0a0a);
+    border-bottom:2px solid var(--red);
+    padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;
+  }
+  .logo{
+    font-size:1.6rem;font-weight:800;letter-spacing:1px;
+    color:var(--text);
+  }
+  .logo span{color:var(--red-bright);}
+  nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .btn{
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:9px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.9rem;
+    font-weight:600;
+    transition:.15s;
+  }
+  .btn:hover{border-color:var(--red);}
+  .btn-red{
+    background:var(--red);
+    border-color:var(--red);
+  }
+  .btn-red:hover{background:var(--red-bright);}
+  .btn-gold{
+    background:linear-gradient(135deg,var(--gold),#c9972f);
+    color:#1a1200;
+    border:none;
+    font-weight:800;
+    box-shadow:0 0 18px rgba(255,213,88,.55);
+  }
+  .btn-gold:hover{box-shadow:0 0 28px rgba(255,213,88,.85);}
+  .pill-user{
+    font-size:.85rem;color:var(--text-dim);
+    display:flex;align-items:center;gap:8px;
+  }
+
+  main{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+
+  h1.page-title{
+    font-size:1.8rem;margin:0 0 6px;
+  }
+  .sub{color:var(--text-dim);margin-bottom:26px;}
+
+  /* GRID DE PRODUTOS */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:18px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    transition:.15s;
+  }
+  .card:hover{border-color:var(--red);transform:translateY(-2px);}
+  .card-img{
+    width:100%;aspect-ratio:1/1;object-fit:cover;background:#1e1e1e;
+  }
+  .card-img.placeholder{
+    display:flex;align-items:center;justify-content:center;
+    color:#555;font-size:.8rem;
+  }
+  .card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .card-name{font-weight:700;font-size:1rem;}
+  .price-row{display:flex;align-items:baseline;gap:8px;margin-top:auto;}
+  .price-old{color:var(--text-dim);text-decoration:line-through;font-size:.85rem;}
+  .price-new{color:var(--gold);font-weight:800;font-size:1.15rem;}
+  .card-buy{
+    margin-top:8px;width:100%;
+    background:var(--red);border:none;color:#fff;
+    padding:10px;border-radius:8px;font-weight:700;cursor:pointer;
+  }
+  .card-buy:hover{background:var(--red-bright);}
+  .empty-msg{color:var(--text-dim);text-align:center;padding:40px 0;}
+
+  /* MODAL */
+  .overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
+    align-items:center;justify-content:center;z-index:100;padding:16px;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--bg-soft);border:1px solid var(--red);
+    border-radius:14px;padding:26px;width:100%;max-width:380px;
+    max-height:90vh;overflow-y:auto;
+  }
+  .modal h2{margin-top:0;color:var(--text);}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:.8rem;color:var(--text-dim);margin-bottom:5px;}
+  .field input, .field textarea{
+    width:100%;padding:10px 12px;border-radius:8px;
+    background:#0d0d0d;border:1px solid var(--border);color:var(--text);
+    font-size:.95rem;
+  }
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--red);}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .modal-actions .btn{flex:1;}
+  .switch-link{text-align:center;margin-top:14px;font-size:.85rem;color:var(--text-dim);}
+  .switch-link a{color:var(--red-bright);font-weight:600;}
+  .error-msg{color:var(--red-bright);font-size:.85rem;margin-top:8px;display:none;}
+
+  /* PRODUTO - PAGINA DEDICADA */
+  .product-page{display:none;}
+  .product-page.show{display:block;}
+  .back-link{display:inline-block;margin-bottom:18px;color:var(--text-dim);}
+  .back-link:hover{color:var(--text);}
+  .product-detail{
+    display:grid;grid-template-columns:1fr 1fr;gap:34px;
+  }
+  @media(max-width:700px){.product-detail{grid-template-columns:1fr;}}
+  .product-detail img{border-radius:14px;border:1px solid var(--border);}
+  .pd-name{font-size:1.7rem;font-weight:800;margin:0 0 10px;}
+  .pd-price{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;}
+  .pd-price .old{color:var(--text-dim);text-decoration:line-through;font-size:1.1rem;}
+  .pd-price .new{color:var(--gold);font-weight:900;font-size:2rem;}
+  .qty-row{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+  .qty-box{display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .qty-box button{background:var(--card);border:none;color:#fff;width:36px;height:36px;font-size:1.1rem;cursor:pointer;}
+  .qty-box span{width:42px;text-align:center;font-weight:700;}
+  .pd-total{color:var(--text-dim);font-size:.95rem;margin-bottom:20px;}
+  .pix-box{
+    background:var(--card);border:1px dashed var(--border);
+    border-radius:10px;padding:14px;margin-top:18px;font-size:.85rem;color:var(--text-dim);
+  }
+  .buy-big{
+    width:100%;padding:16px;font-size:1.05rem;border-radius:10px;
+    letter-spacing:.3px;
+  }
+
+  /* ADMIN */
+  .admin-section{display:none;}
+  .admin-section.show{display:block;}
+  .admin-table{width:100%;border-collapse:collapse;margin-top:20px;}
+  .admin-table th,.admin-table td{
+    border-bottom:1px solid var(--border);padding:10px 8px;text-align:left;font-size:.88rem;
+  }
+  .admin-table th{color:var(--text-dim);font-weight:600;}
+  .admin-table img{width:42px;height:42px;object-fit:cover;border-radius:6px;}
+  .admin-form{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:20px;margin-bottom:10px;max-width:480px;
+  }
+  .admin-form h3{margin-top:0;}
+  .mini-del{
+    background:transparent;border:1px solid var(--red);color:var(--red-bright);
+    padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;
+  }
+  .mini-del:hover{background:var(--red);color:#fff;}
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--card);border:1px solid var(--red);color:var(--text);
+    padding:12px 20px;border-radius:10px;z-index:200;display:none;font-size:.9rem;
+  }
+  footer{
+    text-align:center;color:var(--text-dim);font-size:.8rem;
+    padding:24px 10px;border-top:1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">HENRIQ<span>XIT</span></div>
+  <nav id="navArea"></nav>
+</header>
+
+<main>
+
+  <!-- LOJA -->
+  <section id="viewLoja">
+    <h1 class="page-title">Loja HENRIQXIT</h1>
+    <div class="sub">Pagamento via Pix • Entrega rápida</div>
+    <div class="grid" id="productGrid"></div>
+  </section>
+
+  <!-- PAGINA DE PRODUTO -->
+  <section id="viewProduto" class="product-page">
+    <a href="#" class="back-link" id="backToStore">&larr; Voltar para a loja</a>
+    <div class="product-detail" id="productDetail"></div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="viewAdmin" class="admin-section">
+    <h1 class="page-title">Painel Admin</h1>
+    <div class="sub">Gerenciar produtos</div>
+
+    <div class="admin-form">
+      <h3>Adicionar produto</h3>
+      <div class="field"><label>Nome</label><input id="apName" type="text"></div>
+      <div class="field"><label>Imagem</label><input id="apImg" type="file" accept="image/*"></div>
+      <div class="field"><label>Preço original (R$)</label><input id="apOld" type="number" step="0.01"></div>
+      <div class="field"><label>Preço com desconto (R$)</label><input id="apNew" type="number" step="0.01"></div>
+      <div class="field"><label>Link externo (opcional — se preenchido, "Comprar agora" leva direto para ele)</label><input id="apLink" type="text" placeholder="https://..."></div>
+      <button class="btn btn-red" id="apSave" style="width:100%;">Salvar produto</button>
+    </div>
+
+    <table class="admin-table">
+      <thead><tr><th>Img</th><th>Nome</th><th>Preço</th><th>Link</th><th></th></tr></thead>
+      <tbody id="adminProductList"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>HENRIQXIT — todos os direitos reservados</footer>
+
+<!-- MODAL LOGIN -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <h2>Entrar</h2>
+    <div class="field"><label>Gmail</label><input id="loginEmail" type="email"></div>
+    <div class="field"><label>Senha</label><input id="loginPass" type="password"></div>
+    <div class="error-msg" id="loginError"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('loginOverlay')">Cancelar</button>
+      <button class="btn btn-red" id="loginSubmit">Entrar</button>
+    </div>
+    <div class="switch-link">Não tem conta? <a id="goToCadastro">Cadastre-se</a></div>
+  </div>
+</div>
+
+<!-- MODAL CADASTRO -->
+<div class="overlay" id="cadastroOverlay">
+  <div class="modal">
+    <h2>Criar conta</h2>
+    <div class="field"><label>Nome</label><input id="cadNome" type="text"></div>
+    <div class="field"><label>Gmail</label><input id="cadEmail" type="email"></div>
+    <div class="field"><label>Senha</label><input id="cadPass" type="password"></div>
+    <div class="error-msg" id="cadError"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('cadastroOverlay')">Cancelar</button>
+      <button class="btn btn-red" id="cadSubmit">Criar conta</button>
+    </div>
+    <div class="switch-link">Já tem conta? <a id="goToLogin">Entrar</a></div>
+  </div>
+</div>
+
+<!-- MODAL ADMIN LOGIN -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal">
+    <h2>Acesso Admin</h2>
+    <div class="field"><label>Usuário</label><input id="adminUser" type="text"></div>
+    <div class="field"><label>Senha</label><input id="adminPass" type="password"></div>
+    <div class="error-msg" id="adminError"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('adminOverlay')">Cancelar</button>
+      <button class="btn btn-red" id="adminSubmit">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase (banco de produtos online, em tempo real, pra sempre) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDcucyMj4Ok9-lKQg5CT1QUNW83-nBBDEA",
+  authDomain: "henriqxit-loja.firebaseapp.com",
+  projectId: "henriqxit-loja",
+  storageBucket: "henriqxit-loja.firebasestorage.app",
+  messagingSenderId: "601630148877",
+  appId: "1:601630148877:web:b64a65778aadea62e64844",
+  measurementId: "G-4BRNCY5WSP"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+
+<script>
+/* ===================== DADOS (localStorage) ===================== */
+const LS_USERS = 'henriqxit_users';
+const LS_SESSION = 'henriqxit_session';
+const LS_ADMIN_SESSION = 'henriqxit_admin_session';
+const ADMIN_USER = 'henrique';
+/* senha do admin fica só como HASH aqui — nunca em texto puro.
+   senha atual: 123henrique  (guarde em lugar seguro; o código só tem o hash dela)
+   pra trocar a senha: abra o site, abra o Console do navegador (F12) e rode:
+   await hashPassword('SUA_NOVA_SENHA')  → copie o resultado e cole abaixo em ADMIN_PASS_HASH */
+const ADMIN_PASS_HASH = 'a6d0c1df840564c89ce56258b06b8be9fc769ac860913b72144148f8c6018163';
+
+function getUsers(){ return JSON.parse(localStorage.getItem(LS_USERS) || '[]'); }
+function saveUsers(u){ localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+function getSession(){ return JSON.parse(localStorage.getItem(LS_SESSION) || 'null'); }
+function setSession(s){ localStorage.setItem(LS_SESSION, JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem(LS_SESSION); }
+
+/* ===== PRODUTOS agora vivem no Firebase (Firestore), não no navegador =====
+   cachedProducts é atualizado automaticamente em tempo real sempre que
+   algo muda no banco, em qualquer aparelho. */
+let cachedProducts = [];
+function getProducts(){ return cachedProducts; }
+
+function startProductsListener(){
+  db.collection('products').orderBy('createdAt','desc').onSnapshot(
+    (snap)=>{
+      cachedProducts = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      if(location.hash.startsWith('#produto-')){
+        openProductPage(location.hash.replace('#produto-',''));
+      } else {
+        renderStore();
+      }
+      if(document.getElementById('viewAdmin').classList.contains('show')){
+        renderAdminList();
+      }
+    },
+    (err)=>{
+      console.error(err);
+      toast('Não consegui conectar ao banco de dados. Verifique sua internet.');
+    }
+  );
+}
+
+/* ===== SENHA EMBARALHADA (HASH) =====
+   A senha nunca é salva em texto puro — é transformada antes de guardar. */
+async function hashPassword(pass){
+  if(window.crypto && crypto.subtle){
+    try{
+      const enc = new TextEncoder().encode(pass);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){ /* cai no fallback abaixo */ }
+  }
+  let h = 0;
+  for(let i=0;i<pass.length;i++){ h = (h<<5) - h + pass.charCodeAt(i); h |= 0; }
+  return 'fb_' + Math.abs(h).toString(16);
+}
+
+/* ===== REDUZIR IMAGEM antes de guardar (evita estourar o armazenamento) ===== */
+function resizeImageFile(file, maxSize, quality){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      img.onload = ()=>{
+        let { width, height } = img;
+        if(width > height && width > maxSize){
+          height = Math.round(height * (maxSize/width)); width = maxSize;
+        } else if(height > maxSize){
+          width = Math.round(width * (maxSize/height)); height = maxSize;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function isAdminLogged(){ return localStorage.getItem(LS_ADMIN_SESSION) === '1'; }
+
+/* ===================== TOAST ===================== */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.style.display='none'; }, 2600);
+}
+
+/* ===================== MODAIS ===================== */
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+document.getElementById('goToCadastro').onclick = ()=>{ closeModal('loginOverlay'); openModal('cadastroOverlay'); };
+document.getElementById('goToLogin').onclick = ()=>{ closeModal('cadastroOverlay'); openModal('loginOverlay'); };
+
+/* ===================== LOGIN / CADASTRO ===================== */
+document.getElementById('cadSubmit').onclick = async ()=>{
+  const nome = document.getElementById('cadNome').value.trim();
+  const email = document.getElementById('cadEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('cadPass').value;
+  const err = document.getElementById('cadError');
+  if(!nome || !email || !pass){ err.textContent='Preencha todos os campos.'; err.style.display='block'; return; }
+  const users = getUsers();
+  if(users.find(u=>u.email===email)){ err.textContent='Esse Gmail já tem cadastro.'; err.style.display='block'; return; }
+  const passHash = await hashPassword(pass);
+  users.push({nome, email, pass: passHash});
+  saveUsers(users);
+  setSession({nome, email});
+  closeModal('cadastroOverlay');
+  err.style.display='none';
+  renderNav();
+  toast('Conta criada! Bem-vindo, '+nome+'.');
+};
+
+document.getElementById('loginSubmit').onclick = async ()=>{
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  const passHash = await hashPassword(pass);
+  const users = getUsers();
+  const u = users.find(u=>u.email===email && u.pass===passHash);
+  if(!u){ err.textContent='Gmail ou senha incorretos.'; err.style.display='block'; return; }
+  setSession({nome:u.nome, email:u.email});
+  closeModal('loginOverlay');
+  err.style.display='none';
+  renderNav();
+  toast('Bem-vindo de volta, '+u.nome+'!');
+};
+
+function logout(){
+  clearSession();
+  renderNav();
+  toast('Você saiu da conta.');
+}
+
+/* ===================== ADMIN LOGIN ===================== */
+document.getElementById('adminSubmit').onclick = async ()=>{
+  const u = document.getElementById('adminUser').value.trim().toLowerCase();
+  const p = document.getElementById('adminPass').value.trim();
+  const err = document.getElementById('adminError');
+  const pHash = await hashPassword(p);
+  if(u === ADMIN_USER.toLowerCase() && pHash === ADMIN_PASS_HASH){
+    localStorage.setItem(LS_ADMIN_SESSION,'1');
+    closeModal('adminOverlay');
+    err.style.display='none';
+    goToAdmin();
+    toast('Acesso admin liberado.');
+  } else {
+    err.textContent='Usuário ou senha incorretos.';
+    err.style.display='block';
+  }
+};
+
+function adminLogout(){
+  localStorage.removeItem(LS_ADMIN_SESSION);
+  showView('loja');
+  renderNav();
+  toast('Você saiu do painel admin.');
+}
+
+/* ===================== NAV ===================== */
+function renderNav(){
+  const nav = document.getElementById('navArea');
+  const session = getSession();
+  let html = '';
+  if(session){
+    html += `<span class="pill-user">Olá, ${escapeHtml(session.nome)}</span>`;
+    html += `<button class="btn" onclick="logout()">Sair</button>`;
+  } else {
+    html += `<button class="btn" id="navLogin">Entrar</button>`;
+    html += `<button class="btn btn-red" id="navCadastro">Cadastrar</button>`;
+  }
+  if(isAdminLogged()){
+    html += `<button class="btn" onclick="goToAdmin()">Admin</button>`;
+    html += `<button class="btn" onclick="adminLogout()">Sair admin</button>`;
+  } else {
+    html += `<button class="btn" id="navAdmin">Admin</button>`;
+  }
+  nav.innerHTML = html;
+
+  if(!session){
+    document.getElementById('navLogin').onclick = ()=>openModal('loginOverlay');
+    document.getElementById('navCadastro').onclick = ()=>openModal('cadastroOverlay');
+  }
+  if(!isAdminLogged()){
+    document.getElementById('navAdmin').onclick = ()=>openModal('adminOverlay');
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ===================== VIEWS ===================== */
+function showView(name){
+  document.getElementById('viewLoja').style.display = (name==='loja')?'block':'none';
+  document.getElementById('viewProduto').classList.toggle('show', name==='produto');
+  document.getElementById('viewAdmin').classList.toggle('show', name==='admin');
+  window.scrollTo(0,0);
+}
+
+function goToAdmin(){
+  if(!isAdminLogged()){ openModal('adminOverlay'); return; }
+  showView('admin');
+  renderAdminList();
+}
+
+document.getElementById('backToStore').onclick = (e)=>{
+  e.preventDefault();
+  location.hash = '';
+  showView('loja');
+};
+
+/* ===================== LOJA / PRODUTOS ===================== */
+function money(v){
+  return 'R$ ' + Number(v).toFixed(2).replace('.',',');
+}
+
+function renderStore(){
+  const grid = document.getElementById('productGrid');
+  const products = getProducts();
+  if(products.length === 0){
+    grid.innerHTML = '<div class="empty-msg">Nenhum produto cadastrado ainda.</div>';
+    return;
+  }
+  grid.innerHTML = products.map(p=>`
+    <div class="card">
+      ${p.img ? `<img class="card-img" src="${p.img}">` : `<div class="card-img placeholder">sem imagem</div>`}
+      <div class="card-body">
+        <div class="card-name">${escapeHtml(p.name)}</div>
+        <div class="price-row">
+          ${p.oldPrice ? `<span class="price-old">${money(p.oldPrice)}</span>` : ''}
+          <span class="price-new">${money(p.newPrice)}</span>
+        </div>
+        <button class="card-buy" onclick="buyNow('${p.id}')">Comprar agora</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buyNow(id){
+  const p = getProducts().find(x=>x.id===id);
+  if(!p) return;
+  if(p.link){
+    window.open(p.link, '_blank');
+    return;
+  }
+  location.hash = '#produto-' + id;
+  openProductPage(id);
+}
+
+function openProductPage(id){
+  const p = getProducts().find(x=>x.id===id);
+  if(!p){ showView('loja'); return; }
+  let qty = 1;
+  const wrap = document.getElementById('productDetail');
+
+  function render(){
+    const total = (p.newPrice * qty).toFixed(2).replace('.',',');
+    wrap.innerHTML = `
+      ${p.img ? `<img src="${p.img}">` : `<div class="card-img placeholder" style="aspect-ratio:1/1;">sem imagem</div>`}
+      <div>
+        <div class="pd-name">${escapeHtml(p.name)}</div>
+        <div class="pd-price">
+          ${p.oldPrice ? `<span class="old">${money(p.oldPrice)}</span>` : ''}
+          <span class="new">${money(p.newPrice)}</span>
+        </div>
+        <div class="qty-row">
+          <span style="color:var(--text-dim);font-size:.9rem;">Quantidade:</span>
+          <div class="qty-box">
+            <button id="qtyMinus">−</button>
+            <span id="qtyVal">${qty}</span>
+            <button id="qtyPlus">+</button>
+          </div>
+        </div>
+        <div class="pd-total">Total: <strong style="color:var(--text);">R$ ${total}</strong></div>
+        <button class="btn btn-gold buy-big" id="pdBuyBtn">Comprar agora</button>
+        <div class="pix-box">Pagamento via Pix. Após clicar em "Comprar agora", você receberá as instruções de pagamento.</div>
+      </div>
+    `;
+    document.getElementById('qtyMinus').onclick = ()=>{ if(qty>1){qty--; render();} };
+    document.getElementById('qtyPlus').onclick = ()=>{ qty++; render(); };
+    document.getElementById('pdBuyBtn').onclick = ()=>{
+      if(p.link){ window.open(p.link,'_blank'); return; }
+      toast('Pedido gerado! Total: R$ '+total+' — pagamento via Pix.');
+    };
+  }
+  render();
+  showView('produto');
+}
+
+/* lida com hash direto (link compartilhável) */
+window.addEventListener('hashchange', handleHash);
+function handleHash(){
+  const h = location.hash;
+  if(h.startsWith('#produto-')){
+    openProductPage(h.replace('#produto-',''));
+  } else {
+    showView('loja');
+  }
+}
+
+/* ===================== ADMIN: CRUD PRODUTOS ===================== */
+let pendingImgData = null;
+document.getElementById('apImg').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file){ pendingImgData = null; return; }
+  toast('Processando imagem...');
+  pendingImgData = await resizeImageFile(file, 800, 0.72);
+});
+
+document.getElementById('apSave').onclick = ()=>{
+  const name = document.getElementById('apName').value.trim();
+  const oldP = document.getElementById('apOld').value;
+  const newP = document.getElementById('apNew').value;
+  const link = document.getElementById('apLink').value.trim();
+  if(!name || !newP){ toast('Preencha ao menos nome e preço com desconto.'); return; }
+
+  const btn = document.getElementById('apSave');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  db.collection('products').add({
+    name,
+    oldPrice: oldP ? parseFloat(oldP) : null,
+    newPrice: parseFloat(newP),
+    img: pendingImgData || null,
+    link: link || null,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    document.getElementById('apName').value = '';
+    document.getElementById('apOld').value = '';
+    document.getElementById('apNew').value = '';
+    document.getElementById('apLink').value = '';
+    document.getElementById('apImg').value = '';
+    pendingImgData = null;
+    toast('Produto salvo! Já aparece em todos os aparelhos.');
+  }).catch((err)=>{
+    console.error(err);
+    toast('Não deu pra salvar. Verifique sua internet e tente de novo.');
+  }).finally(()=>{
+    btn.disabled = false;
+    btn.textContent = 'Salvar produto';
+  });
+};
+
+function renderAdminList(){
+  const tbody = document.getElementById('adminProductList');
+  const products = getProducts();
+  if(products.length===0){
+    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-dim);">Nenhum produto ainda.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = products.map(p=>`
+    <tr>
+      <td>${p.img ? `<img src="${p.img}">` : '—'}</td>
+      <td>${escapeHtml(p.name)}</td>
+      <td>${money(p.newPrice)}</td>
+      <td>${p.link ? 'Sim' : 'Não'}</td>
+      <td><button class="mini-del" onclick="deleteProduct('${p.id}')">Excluir</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteProduct(id){
+  db.collection('products').doc(id).delete()
+    .then(()=>{ toast('Produto removido.'); })
+    .catch((err)=>{
+      console.error(err);
+      toast('Não consegui remover. Verifique sua internet.');
+    });
+}
+
+document.getElementById('adminPass').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){ document.getElementById('adminSubmit').click(); }
+});
+document.getElementById('loginPass').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){ document.getElementById('loginSubmit').click(); }
+});
+document.getElementById('cadPass').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){ document.getElementById('cadSubmit').click(); }
+});
+
+/* ===================== INIT ===================== */
+renderNav();
+handleHash();
+startProductsListener();
+</script>
+</body>
+</html>
